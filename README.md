@@ -74,7 +74,7 @@ First step: set Secret key of application as environment variables. (SEE `.examp
 ```
 
 ### Documentation
-For more information, see the [Payriff Gateway Documentation](https://payriff.com/docs/gateway/).
+For more information, see the [Payriff Gateway Documentation](https://docs.payriff.com/).
 
 
 ### Credits
