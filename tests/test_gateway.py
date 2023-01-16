@@ -1,6 +1,6 @@
 import unittest
 
-from payriff_gateway.base import PayriffGateway
+from payriff_gateway import PayriffGateway
 
 
 class PayriffGatewayTestCase(unittest.TestCase):
