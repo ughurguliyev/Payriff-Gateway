@@ -68,8 +68,8 @@ First step: set Secret key of application as environment variables. (SEE `.examp
 **Example: get_order_status_instance()**
 
 ```python
->>> payment_status_obj = gateway.get_payment_status()
->>> payment_status_obj
+>>> order_status_obj = gateway.get_order_status_instance()
+>>> order_status_obj
 >>> OrderStatus(order_id='00000', status_code='00000', status='CREATED', message='Operation performed successfully')
 ```
 
