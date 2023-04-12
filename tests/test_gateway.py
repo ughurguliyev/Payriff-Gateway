@@ -1,6 +1,7 @@
 import unittest
 
 from payriff_gateway import PayriffGateway
+from payriff_gateway.result_codes import ResultCodes
 
 
 class PayriffGatewayTestCase(unittest.TestCase):
@@ -19,22 +20,22 @@ class PayriffGatewayTestCase(unittest.TestCase):
             description='Test order',
             language='AZ',
         )
-    
+
     def test_create_order(self) -> None:
-        self.assertEqual(self.order['status_code'], '00000')
-    
+        self.assertEqual(self.order['status_code'], ResultCodes.SUCCESS.value)
+
     def test_get_order_status(self) -> None:
         result = self.gateway.get_order_status(
             order_id=self.order['order_id'],
             language='AZ',
             session_id=self.order['session_id'],
         )
-        self.assertEqual(result['status_code'], '00000')
-    
+        self.assertEqual(result['status_code'], ResultCodes.SUCCESS.value)
+
     def test_refund_order(self) -> None:
         result = self.gateway.refund_order(
             amount=100,
             order_id=self.order['order_id'],
             session_id=self.order['session_id'],
         )
-        self.assertEqual(result['status_code'], '01000')
+        self.assertEqual(result['status_code'], ResultCodes.WARNING.value)

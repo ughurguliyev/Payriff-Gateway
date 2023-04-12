@@ -1,8 +1,10 @@
-import os
-import requests
 import json
+import os
+
+import requests
 
 from .payment import Order, OrderStatus, RefundOrder
+from .result_codes import ResultCodes
 
 
 class PayriffGateway:
@@ -11,11 +13,11 @@ class PayriffGateway:
     SECRET_KEY = os.getenv("PAYRIFF_SECRET_KEY")
 
     def __init__(
-        self,
-        merchant_id: str,
-        approve_url: str,
-        cancel_url: str,
-        decline_url: str) -> None:
+            self,
+            merchant_id: str,
+            approve_url: str,
+            cancel_url: str,
+            decline_url: str) -> None:
         self.merchant_id = merchant_id
         self.approve_url = approve_url
         self.cancel_url = cancel_url
@@ -34,7 +36,7 @@ class PayriffGateway:
             "Connection": "keep-alive",
         }
         r = requests.post(
-            url, 
+            url,
             data=payload,
             headers=headers,
         )
@@ -42,7 +44,7 @@ class PayriffGateway:
 
     def __build_json_payload(self, data: dict) -> dict:
         return json.dumps(data)
-    
+
     def __build_order_object(self, initial_data: dict, result: dict) -> None:
         self.__order_instance = Order(
             amount=initial_data["body"]["amount"],
@@ -61,7 +63,7 @@ class PayriffGateway:
             status=result["payload"]["orderStatus"],
             message=result["message"],
         )
-    
+
     def __build_refund_order_object(self, result: dict) -> None:
         self.__refund_order_instance = RefundOrder(
             status_code=result["code"],
@@ -71,17 +73,17 @@ class PayriffGateway:
 
     def get_order(self) -> Order:
         return self.__order_instance
-    
+
     def get_order_status_instance(self) -> OrderStatus:
         return self.__order_status_instance
 
     def create_order(
-        self,
-        amount: float,
-        currency: str,
-        direct_pay: bool = True,
-        description: str = None,
-        language: str = "AZ") -> dict:
+            self,
+            amount: float,
+            currency: str,
+            direct_pay: bool = True,
+            description: str = None,
+            language: str = "AZ") -> dict:
         order_data = {
             "body": {
                 "amount": amount,
@@ -100,21 +102,23 @@ class PayriffGateway:
             method_name="createOrder",
             payload=json_payload,
         )
+        if result["code"] != ResultCodes.SUCCESS.value:
+            raise Exception(result["message"])
         self.__build_order_object(initial_data=order_data, result=result)
         order = self.get_order()
-        
+
         return {
             "status_code": order.status_code,
-            "payment_url": order.payment_url, 
-            "session_id": order.session_id, 
+            "payment_url": order.payment_url,
+            "session_id": order.session_id,
             "order_id": order.order_id
         }
-    
+
     def get_order_status(
-        self,
-        order_id: str = None,
-        language: str = "AZ",
-        session_id: str = None) -> dict:
+            self,
+            order_id: str = None,
+            language: str = "AZ",
+            session_id: str = None) -> dict:
         order_data = {
             "body": {
                 "language": language,
@@ -128,6 +132,8 @@ class PayriffGateway:
             method_name="getStatusOrder",
             payload=json_payload,
         )
+        if result["code"] != ResultCodes.SUCCESS.value:
+            raise Exception(result["message"])
         self.__build_order_status_object(initial_data=order_data, result=result)
         order_status = self.get_order_status_instance()
 
@@ -139,10 +145,10 @@ class PayriffGateway:
         }
 
     def refund_order(
-        self,
-        amount: float,
-        order_id: str = None,
-        session_id: str = None) -> dict:
+            self,
+            amount: float,
+            order_id: str = None,
+            session_id: str = None) -> dict:
         order_data = {
             "body": {
                 "refundAmount": amount,
